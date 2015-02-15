@@ -15,7 +15,8 @@ indivudal spanning from October to November of 2012.
 First we need to load necessary libraries, Unzip the data (if necessary), 
 load into this R session, and convert factor data for the date into POSIXct data.
 
-```{r load.process.data, echo=TRUE}
+
+```r
 library('ggplot2')
 library('reshape2')
 
@@ -34,17 +35,34 @@ a histogram of this data followed by calculating the mean and median. We
 can see from the plot that the average number of steps over this time period
 is roughly normally distributed. 
 
-```{r distribution,echo=TRUE}
+
+```r
 steps.per.day <- tapply(activity$steps,activity$date,sum)
 ggplot(as.data.frame(steps.per.day),aes(x=steps.per.day))+
     geom_histogram(binwidth=2500)+
     ggtitle(expression(atop("Histogram of steps per day for one individual",
                             atop("October-November 2012"))))+
     labs(x="steps per day",y="count")+theme_bw()
+```
+
+![plot of chunk distribution](figure/distribution-1.png) 
+
+```r
 # mean steps per day
 mean(steps.per.day,na.rm=TRUE)
+```
+
+```
+## [1] 10766.19
+```
+
+```r
 #median steps per day
 median(steps.per.day,na.rm=TRUE)
+```
+
+```
+## [1] 10765
 ```
 
 
@@ -56,7 +74,8 @@ tapply to summarize the data by time interval. Assuming midnight is zero,
 on average, there is heavy traffic in the morning followed by spurts 
 throughout the day. 
 
-```{r activity.pattern,echo=TRUE}
+
+```r
 steps.per.interval.mean <- tapply(activity$steps,activity$interval,
                                   mean,
                                   na.rm=TRUE)
@@ -68,9 +87,18 @@ ggplot(as.data.frame(steps.per.interval.mean),
                             atop("October-November 2012"))))+
     labs(x="minutes",y="number of steps")+
     theme_bw()
+```
+
+![plot of chunk activity.pattern](figure/activity.pattern-1.png) 
+
+```r
 # which interval has the highest average number of steps?
 names(steps.per.interval.mean)[which(steps.per.interval.mean %in% 
                             max(steps.per.interval.mean))]
+```
+
+```
+## [1] "835"
 ```
 
 ## Imputing missing values
@@ -80,7 +108,8 @@ You can see from the following plot that the overall general shape of
 the histogram does not change, but the sums over days shift towards the mean. 
 As for summary statistics, the median shifts very slightly to the mean value. 
 
-```{r addmissing,echo=TRUE}
+
+```r
 #create a new dataset
 activity.addNA <- activity
 #where the NAs are 
@@ -96,11 +125,26 @@ ggplot(as.data.frame(steps.per.day.addNA),aes(x=steps.per.day.addNA))+
         atop("Histogram of steps per day for one individual",
              atop("Added mean values for missing data: Oct-Nov 2012"))))+
     labs(x="steps per day",y="count")+theme_bw()
+```
+
+![plot of chunk addmissing](figure/addmissing-1.png) 
+
+```r
 # mean steps per day
 mean(steps.per.day.addNA)
+```
+
+```
+## [1] 10766.19
+```
+
+```r
 #median steps per day
 median(steps.per.day.addNA)
+```
 
+```
+## [1] 10766.19
 ```
 
 ## Are there differences in activity patterns between weekdays and weekends?
@@ -108,7 +152,8 @@ median(steps.per.day.addNA)
 From the plot below, it seems that less steps are taken during the earlier 
 timepoints on the weekend, but there are more steps during the day on weekdays. 
 
-```{r daybreakdown,echo=TRUE}
+
+```r
 activity.addNA$day <- 
     sapply(activity.addNA$date,
            function(x) ifelse(
@@ -128,3 +173,5 @@ ggplot(steps.per.interval.mean.day.melt,aes(x=interval,y=average.steps))+
     labs(x="minutes",y="number of steps")+facet_grid(day~.)+
     theme_bw()
 ```
+
+![plot of chunk daybreakdown](figure/daybreakdown-1.png) 
